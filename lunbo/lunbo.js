@@ -24,7 +24,6 @@
 		init: function(){
 			this.$el = $(this.get('wrapper'));
 			this.ref = 0; //基数
-			this.I = null; //延时对象
 			this.render();
 			this.bindEvent();
 			this.automove();
