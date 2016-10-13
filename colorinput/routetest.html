@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script type="text/javascript" src="jquery.js"></script>
+	<script type="text/javascript" src="underscore.js"></script>
+	<script type="text/javascript" src="backbone.js"></script>
+    <style type="text/css">
+        .trf-ipt{
+            width: 400px;
+            height: 22px;
+            padding: 5px 10px;
+            line-height: 22px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="ipt-box">
+        
+    </div>
+    <span>1</span>
+    <button>2</button>
+    <button>3</button>
+</body>
+<script type="text/javascript">
+
+$('button').on('click', function(){
+    var content = $(this).html();
+    input.insertHtml('<span>123</span>'); 
+    if(window.getSelection().rangeCount==0){
+        return;
+    }
+    console.log(window.getSelection().getRangeAt(0));
+    if(window.getSelection().getRangeAt(0).endOffset==window.getSelection().getRangeAt(0).endContainer.length){
+        $target = $(window.getSelection().getRangeAt(0).endContainer).parent();
+        var $dom = $('<span>wujing</span>');
+        $target.after($dom).after('<span class="end"></span>');
+        var selection = window.getSelection();
+        selection.addRange(docuemnt.createRange().selectNode($dom[0]));
+    }
+});
+$('span').on('click', function(){
+    var content = $(this).html();
+    input.insertHtml(content);
+                   
+});
+	
+var SimulationInput = Backbone.View.extend({
+    
+    initialize: function(options){
+        this.setElement(options.wrapper);
+        this.render();
+    },
+
+    render: function(){
+        var me = this;
+        me.$el.html('<div class="trf-ipt" contenteditable="true">');
+        me.$ipt = $('.trf-ipt',me.$el).empty();
+        me.$ipt.append('<span>aaa</span><span>bbb</span>');
+    },
+
+    events: {
+        'keydown .trf-ipt': '_formatInput'
+    },
+
+    insertHtml: function(con){
+        //console.log(this.$ipt.get(0).selectionStart);
+        // if(this._isInputFocus()){this.insertHtmlAtCursor(con)}
+        // else{this.$ipt.append(con);}
+    },
+
+    insertHtmlAtCursor: function(con){
+        var sel, range;
+        if (window.getSelection) {
+            // IE9 and 非IE
+            sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+                var el = document.createElement("div");
+                el.innerHTML = con;
+                var frag = document.createDocumentFragment(), node, lastNode;
+                while ( (node = el.firstChild) ) {
+                    lastNode = frag.appendChild(node);
+                }
+                range.insertNode(frag);
+                // 保存光标
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    console.log(range);
+                }
+            }
+        } else if (document.selection && document.selection.type != "Control") {
+            // IE < 9
+            document.selection.createRange().pasteHTML(con);
+        }
+    },
+
+    //选区内容是否停留在计算公式输入框内
+    _isInputFocus: function(){
+        var selection = window.getSelection();
+        console.log(selection);
+        return selection.focusNode && selection.focusNode.className=='trf-ipt';
+    },
+
+    //格式化输入
+    _formatInput: function(e){
+        var keycode = e.keyCode;
+        if(keycode==13){
+            e.preventDefault();
+            return;
+        }
+    }
+});
+
+
+var input = new SimulationInput({
+    wrapper: '.ipt-box'
+});
+</script>
+
+</html>
